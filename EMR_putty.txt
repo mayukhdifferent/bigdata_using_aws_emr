@@ -1,0 +1,486 @@
+login as: ec2-user
+Authenticating with public key "imported-openssh-key" from agent
+
+       __|  __|_  )
+       _|  (     /   Amazon Linux 2 AMI
+      ___|\___|___|
+
+https://aws.amazon.com/amazon-linux-2/
+[ec2-user@ip-10-1-11-242 ~]$ ssh hadoop@ec2-54-86-227-232.compute-1.amazonaws.com
+The authenticity of host 'ec2-54-86-227-232.compute-1.amazonaws.com (10.1.12.30)' can't be established.
+ECDSA key fingerprint is SHA256:E9Po4p5Oe+rO4o2Yl70tXYUR10Tuledebh9/LerAJV8.
+ECDSA key fingerprint is MD5:19:33:f1:ba:df:51:27:d7:17:b7:58:01:75:df:b0:53.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'ec2-54-86-227-232.compute-1.amazonaws.com,10.1.12.30' (ECDSA) to the list of known hosts.
+Last login: Tue Dec  8 16:07:02 2020
+
+       __|  __|_  )
+       _|  (     /   Amazon Linux 2 AMI
+      ___|\___|___|
+
+https://aws.amazon.com/amazon-linux-2/
+9 package(s) needed for security, out of 14 available
+Run "sudo yum update" to apply all updates.
+
+EEEEEEEEEEEEEEEEEEEE MMMMMMMM           MMMMMMMM RRRRRRRRRRRRRRR
+E::::::::::::::::::E M:::::::M         M:::::::M R::::::::::::::R
+EE:::::EEEEEEEEE:::E M::::::::M       M::::::::M R:::::RRRRRR:::::R
+  E::::E       EEEEE M:::::::::M     M:::::::::M RR::::R      R::::R
+  E::::E             M::::::M:::M   M:::M::::::M   R:::R      R::::R
+  E:::::EEEEEEEEEE   M:::::M M:::M M:::M M:::::M   R:::RRRRRR:::::R
+  E::::::::::::::E   M:::::M  M:::M:::M  M:::::M   R:::::::::::RR
+  E:::::EEEEEEEEEE   M:::::M   M:::::M   M:::::M   R:::RRRRRR::::R
+  E::::E             M:::::M    M:::M    M:::::M   R:::R      R::::R
+  E::::E       EEEEE M:::::M     MMM     M:::::M   R:::R      R::::R
+EE:::::EEEEEEEE::::E M:::::M             M:::::M   R:::R      R::::R
+E::::::::::::::::::E M:::::M             M:::::M RR::::R      R::::R
+EEEEEEEEEEEEEEEEEEEE MMMMMMM             MMMMMMM RRRRRRR      RRRRRR
+
+[hadoop@ip-10-1-12-30 ~]$ hive
+
+Logging initialized using configuration in file:/etc/hive/conf.dist/hive-log4j2.                                                                                        properties Async: false
+hive> CREATE EXTERNAL TABLE ngrams
+    > (gram string, year int, occurrences bigint, pages bigint, books bigint)
+    > ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+    > STORED AS SEQUENCEFILE
+    > LOCATION 's3://datasets.elasticmapreduce/ngrams/books/20090715/eng-1M/1gra                                                                                        m/';
+OK
+Time taken: 5.35 seconds
+hive> DESCRIBE ngrams;
+OK
+gram                    string
+year                    int
+occurrences             bigint
+pages                   bigint
+books                   bigint
+Time taken: 0.152 seconds, Fetched: 5 row(s)
+hive> SELECT * FROM ngrams LIMIT 10;
+OK
+#       1574    1       1       1
+#       1584    6       6       1
+#       1614    1       1       1
+#       1631    115     100     1
+#       1632    3       3       1
+#       1635    1       1       1
+#       1640    1       1       1
+#       1641    1       1       1
+#       1642    5       5       1
+#       1644    234     193     1
+Time taken: 1.257 seconds, Fetched: 10 row(s)
+hive> CREATE TABLE normalized
+    > (gram string, year int, occurrences bigint);
+OK
+Time taken: 0.405 seconds
+hive> INSERT OVERWRITE TABLE normalized
+    > SELECT lower(gram), year, occurrences
+    > FROM ngrams
+    > WHERE year BETWEEN 1990 AND 2005
+    > AND gram REGEXP "^[A-Za-z+\'-]{3,}$";
+Query ID = hadoop_20201208161311_641dfdd0-0cd5-4091-b4c1-48256f160067
+Total jobs = 1
+Launching Job 1 out of 1
+Status: Running (Executing on YARN cluster with App id application_1607442558945                                                                                        _0001)
+
+Map 1: -/-
+Map 1: 0/14
+Map 1: 0/14
+Map 1: 0(+1)/14
+Map 1: 0(+5)/14
+Map 1: 0(+6)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 0(+7)/14
+Map 1: 1(+6)/14
+Map 1: 1(+7)/14
+Map 1: 2(+6)/14
+Map 1: 2(+7)/14
+Map 1: 3(+6)/14
+Map 1: 3(+7)/14
+Map 1: 3(+7)/14
+Map 1: 3(+7)/14
+Map 1: 4(+6)/14
+Map 1: 4(+7)/14
+Map 1: 5(+6)/14
+Map 1: 6(+5)/14
+Map 1: 6(+6)/14
+Map 1: 7(+6)/14
+Map 1: 7(+7)/14
+Map 1: 7(+7)/14
+Map 1: 7(+7)/14
+Map 1: 8(+6)/14
+Map 1: 9(+5)/14
+Map 1: 10(+4)/14
+Map 1: 10(+4)/14
+Map 1: 10(+4)/14
+Map 1: 10(+4)/14
+Map 1: 10(+4)/14
+Map 1: 11(+3)/14
+Map 1: 12(+2)/14
+Map 1: 13(+1)/14
+Map 1: 14/14
+Loading data to table default.normalized
+OK
+Time taken: 80.426 seconds
+hive> SELECT * FROM normalized LIMIT 20;
+OK
+ingermany       1991    1
+ingermany       1993    1
+ingermany       1994    3
+ingermany       1996    1
+ingermany       2001    1
+ingermany       2004    1
+ingermany       2005    1
+ingreece        1990    1
+ingreece        2001    1
+ingreece        2004    1
+injuly  1990    7
+injuly  1991    3
+injuly  1992    6
+injuly  1993    4
+injuly  1994    1
+injuly  1995    5
+injuly  1996    4
+injuly  1998    4
+injuly  1999    3
+injuly  2000    6
+Time taken: 0.106 seconds, Fetched: 20 row(s)
+hive> -- Display the 50 most-used words
+hive> SELECT
+    >   gram,
+    >   sum(occurrences) as total_occurrences
+    > FROM normalized
+    > GROUP BY gram
+    > ORDER BY total_occurrences DESC
+    > LIMIT 50;
+Query ID = hadoop_20201208161503_1d8182f0-bfb5-4771-91cb-3280c8d1a6ee
+Total jobs = 1
+Launching Job 1 out of 1
+Status: Running (Executing on YARN cluster with App id application_1607442558945_0001)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     14         14        0        0       0       0
+Reducer 2 ...... container     SUCCEEDED      4          4        0        0       0       0
+Reducer 3 ...... container     SUCCEEDED      1          1        0        0       0       0
+----------------------------------------------------------------------------------------------
+VERTICES: 03/03  [==========================>>] 100%  ELAPSED TIME: 18.09 s
+----------------------------------------------------------------------------------------------
+OK
+the     600731810
+and     269591500
+that    94084329
+for     80649257
+with    61620362
+was     57843905
+this    45202579
+are     44749547
+from    40039900
+not     38905683
+his     33689806
+have    31100386
+but     29014171
+which   28732316
+you     27930990
+they    27538747
+had     26712182
+were    24825903
+their   24729315
+one     23646682
+all     21382534
+can     19855720
+her     19278458
+has     18670586
+more    18489067
+there   17394454
+when    17001334
+been    16865057
+she     16766345
+other   16254322
+who     16106638
+would   16010618
+these   15806270
+will    15500621
+its     15140867
+also    14916919
+what    14622550
+new     14385290
+may     14343882
+about   13985002
+time    13584842
+some    13494834
+than    13474829
+into    13167016
+only    13040294
+such    12532977
+out     12107615
+them    11976858
+two     11875246
+see     11665869
+Time taken: 18.732 seconds, Fetched: 50 row(s)
+hive> -- Display the 50 most-used words longer than 10 characters
+hive> SELECT
+    >   gram,
+    >   sum(occurrences) as total_occurrences
+    > FROM normalized
+    > WHERE length(gram) > 10
+    > GROUP BY gram
+    > ORDER BY total_occurrences DESC
+    > LIMIT 50;
+Query ID = hadoop_20201208161545_1e068751-cfd0-4891-ab18-c13dc5cd1313
+Total jobs = 1
+Launching Job 1 out of 1
+Status: Running (Executing on YARN cluster with App id application_1607442558945_0001)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     14         14        0        0       0       0
+Reducer 2 ...... container     SUCCEEDED      2          2        0        0       0       0
+Reducer 3 ...... container     SUCCEEDED      1          1        0        0       0       0
+----------------------------------------------------------------------------------------------
+VERTICES: 03/03  [==========================>>] 100%  ELAPSED TIME: 15.48 s
+----------------------------------------------------------------------------------------------
+OK
+development     4584319
+information     4419750
+international   2731441
+relationship    2013252
+significant     1762598
+particularly    1709008
+performance     1669887
+understanding   1631334
+environment     1511561
+organization    1491293
+established     1441713
+association     1385892
+individuals     1376707
+differences     1353913
+traditional     1314358
+appropriate     1309280
+application     1289144
+distribution    1278733
+environmental   1170366
+temperature     1140588
+independent     1120174
+communication   1114437
+introduction    1111958
+administration  1107008
+relationships   1022809
+institutions    1015093
+construction    1005391
+professional    975041
+characteristics 954706
+immediately     946994
+organizations   920193
+description     910751
+perspective     900008
+alternative     893176
+interpretation  879798
+educational     836159
+responsibility  834175
+opportunity     832457
+requirements    816417
+circumstances   815399
+possibility     814106
+responsible     812455
+contemporary    796036
+experiences     773274
+concentration   770073
+interaction     757969
+represented     755851
+applications    754726
+communities     753603
+psychological   739307
+Time taken: 15.992 seconds, Fetched: 50 row(s)
+hive> CREATE TABLE ratios
+    > (gram string, year int, occurrences bigint, ratio double);
+OK
+Time taken: 0.057 seconds
+hive> INSERT OVERWRITE TABLE ratios
+    > SELECT
+    >   a.gram,
+    >   a.year,
+    >   sum(a.occurrences) AS occurrences,
+    >   sum(a.occurrences) / b.total AS ratio
+    > FROM normalized a
+    > JOIN (SELECT year, sum(occurrences) AS total
+    >       FROM normalized
+    >       GROUP BY year) b ON (a.year = b.year)
+    > GROUP BY a.gram, a.year, b.total;
+Query ID = hadoop_20201208161629_8b50f675-75cb-456f-8f63-4260b61fdb80
+Total jobs = 1
+Launching Job 1 out of 1
+Status: Running (Executing on YARN cluster with App id application_1607442558945_0001)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     14         14        0        0       0       0
+Map 2 .......... container     SUCCEEDED     14         14        0        0       0       0
+Reducer 3 ...... container     SUCCEEDED      4          4        0        0       0       0
+Reducer 4 ...... container     SUCCEEDED      4          4        0        0       0       0
+----------------------------------------------------------------------------------------------
+VERTICES: 04/04  [==========================>>] 100%  ELAPSED TIME: 76.69 s
+----------------------------------------------------------------------------------------------
+Loading data to table default.ratios
+OK
+Time taken: 77.591 seconds
+hive> -- Words that most increased in popularity each year
+hive> SELECT year, gram, occurrences, CONCAT(CAST(increase AS INT), 'x increase') as increase FROM
+    > (
+    >   SELECT
+    >     y2.gram,
+    >     y2.year,
+    >     y2.occurrences,
+    >     y2.ratio / y1.ratio as increase,
+    >     rank() OVER (PARTITION BY y2.year ORDER BY y2.ratio / y1.ratio DESC) AS rank
+    >   FROM ratios y2
+    >   JOIN ratios y1 ON y1.gram = y2.gram and y2.year = y1.year + 1
+    >   WHERE
+    >       y2.year BETWEEN 1991 and 2005
+    >   AND y1.occurrences > 1000
+    >   AND y2.occurrences > 1000
+    > ) grams
+    > WHERE rank = 1
+    > ORDER BY year;
+Query ID = hadoop_20201208161829_f16109b3-d393-4854-8af6-18ff4045c30c
+Total jobs = 1
+Launching Job 1 out of 1
+Status: Running (Executing on YARN cluster with App id application_1607442558945_0001)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     12         12        0        0       0       0
+Map 2 .......... container     SUCCEEDED     12         12        0        0       0       0
+Reducer 3 ...... container     SUCCEEDED      2          2        0        0       0       0
+Reducer 4 ...... container     SUCCEEDED      1          1        0        0       0       0
+----------------------------------------------------------------------------------------------
+VERTICES: 04/04  [==========================>>] 100%  ELAPSED TIME: 21.59 s
+----------------------------------------------------------------------------------------------
+OK
+1991    amyloid 6405    5x increase
+1992    comm    18841   8x increase
+1993    abstr   7033    6x increase
+1994    carole  8358    7x increase
+1995    mansfield       4570    3x increase
+1996    polymerization  14442   8x increase
+1997    tho     19259   8x increase
+1998    oswald  8774    6x increase
+1999    sql     12516   6x increase
+2000    dlb     12369   10x increase
+2001    dcs     6031    5x increase
+2002    proust  6231    5x increase
+2003    olfactory       8538    6x increase
+2004    eeg     8873    5x increase
+2005    rectum  6981    6x increase
+Time taken: 22.243 seconds, Fetched: 15 row(s)
+hive> -- Occurrences of 'internet' in books by year?
+hive> SELECT
+    >   year,
+    >   occurrences
+    > FROM ratios
+    > WHERE gram = 'internet'
+    > ORDER BY year;
+Query ID = hadoop_20201208161925_cf41cb43-afd4-4176-b4da-15b1e4cd73e0
+Total jobs = 1
+Launching Job 1 out of 1
+Status: Running (Executing on YARN cluster with App id application_1607442558945_0001)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     12         12        0        0       0       0
+Reducer 2 ...... container     SUCCEEDED      1          1        0        0       0       0
+----------------------------------------------------------------------------------------------
+VERTICES: 02/02  [==========================>>] 100%  ELAPSED TIME: 11.05 s
+----------------------------------------------------------------------------------------------
+OK
+1990    1201
+1991    828
+1992    1981
+1993    5265
+1994    8132
+1995    14491
+1996    21064
+1997    26982
+1998    30317
+1999    40579
+2000    50505
+2001    55799
+2002    55137
+2003    55793
+2004    40861
+2005    39483
+Time taken: 11.471 seconds, Fetched: 16 row(s)
+hive> -- Most popular words of each length
+hive> SELECT DISTINCT length, gram
+    > FROM
+    > (
+    >   SELECT length(gram) AS length,
+    >   gram,
+    >   rank() OVER (partition by length(gram) order by occurrences desc) AS rank
+    >   FROM ratios
+    > ) x
+    > WHERE rank = 1
+    > ORDER BY length;
+Query ID = hadoop_20201208162002_f5bbd89a-1d88-4a44-9624-4029fa5d24b3
+Total jobs = 1
+Launching Job 1 out of 1
+Status: Running (Executing on YARN cluster with App id application_1607442558945_0001)
+
+----------------------------------------------------------------------------------------------
+        VERTICES      MODE        STATUS  TOTAL  COMPLETED  RUNNING  PENDING  FAILED  KILLED
+----------------------------------------------------------------------------------------------
+Map 1 .......... container     SUCCEEDED     12         12        0        0       0       0
+Reducer 2 ...... container     SUCCEEDED      6          6        0        0       0       0
+Reducer 3 ...... container     SUCCEEDED      4          4        0        0       0       0
+Reducer 4 ...... container     SUCCEEDED      1          1        0        0       0       0
+----------------------------------------------------------------------------------------------
+VERTICES: 04/04  [==========================>>] 100%  ELAPSED TIME: 27.75 s
+----------------------------------------------------------------------------------------------
+OK
+3       the
+4       that
+5       which
+6       people
+7       between
+8       american
+9       different
+10      university
+11      development
+12      relationship
+13      international
+14      administration
+15      characteristics
+16      responsibilities
+17      industrialization
+18      telecommunications
+19      hyperparathyroidism
+20      institutionalization
+21      psychopharmacological
+22      electroencephalography
+23      electroencephalographic
+24      cholangiopancreatography
+25      methylenetetrahydrofolate
+26      abcdefghijklmnopqrstuvwxyz
+27      ooooooooooooooooooooooooooo
+28      trimethoprimsulfamethoxazole
+29      methylenedioxymethamphetamine
+30      dipalmitoylphosphatidylcholine
+31      dichlorodiphenyltrichloroethane
+32      oooooooooooooooooooooooooooooooo
+33      ooooooooooooooooooooooooooooooooo
+34      oooooooooooooooooooooooooooooooooo
+35      ooooooooooooooooooooooooooooooooooo
+36      oooooooooooooooooooooooooooooooooooo
+Time taken: 28.357 seconds, Fetched: 34 row(s)
+hive>
